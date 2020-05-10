@@ -1,0 +1,36 @@
+The most fundamental component of my program is the Point class. It holds x,y coordinates for
+each instance and can be initialized directly from the input stream. Additionally, it has the
+overloaded '<' operator which is what std::sort uses by default. Point A is considered lesser than
+Point B iff A.x < B.x. If the x values are equal, then the comparison is performed on the y values.
+
+PointSet is a collection which holds a dynamic array of Points. By default PointSet acts as a set,
+i.e. doesn't allow any duplicates. However, it can be initialized with a false boolean parameter to
+actually allow such behavior and act as a basic collection. 2 quintessential fields of PointSet are
+capacity and size. Capacity is the size of the array of Points it holds and size is the amount of
+Points that the array of Points holds. Essentially, capacity > 0 && capacity >= size must hold for
+all cases. Thus, when needed, the PointSet's array can be resized such that the capacity would match
+the size or on the contrary the capacity would increase to make more room for the array of Points.
+
+The Graham Scan algorithm is performed in the file ConvexHull.cpp. I was determined to implement
+PointSet the way I described it above since the very beginning of this exercise, albeit there was a
+small issue with it. PointSet isn't a linked list in my case, hence knowing the maximal capacity
+needed for the input could make filling the set more efficient. So I made a function which is
+responsible for getting input and adding Points to the PointSet. When a line of input is entered,
+the function makes a recursive call. The recursion doesn't stop until the user hits Ctrl + D. When
+that happens, the PointSet is initialized with its capacity equal to the amount of input lines and
+following the recursive call, it adds the Point to the PointSet. In parallel, the function keeps
+track of the pivot Point (the Point with the minimal x coordinate) Then, it's optional to shrink the
+PointSet's capacity to fit the size (capacity is strictly greater than size in this case iff there
+were duplicate Points). Now, the Graham Scan algorithm is actually redundant if the size of the
+PointSet is <= 2. So if that holds, the PointSet can be sorted regularly and then printed.
+With Graham Scan, we start by swapping the pivot Point with the first Point of the PointSet.
+Afterwards, the PointSet is sorted in polar order w.r.t the pivot Point. That is done with the help
+of a function which receives 3 Points and determines what kind of turn they form: clockwise,
+counter-clockwise or collinear. Then, a comparator function receives the result and returns true if
+it's counter-clockwise or the comparison between the distance of the 2 Points to the pivot in
+case of a collinear turn. The comparator function is then passed to std::sort. Then, a new PointSet
+is constructed to act as a simple collection (because we can assume there won't be any duplicates
+from now on). We add the first 2 points from the set to it and then start a loop which goes over
+all the Points in the PointSet. The new PointSet is used as a stack. We remove the top Point from
+it when the 2 top points don't form a counter-clockwise turn with the pivot Point and then add
+those that do. Ultimately, we use the default sort and print out the stack.
